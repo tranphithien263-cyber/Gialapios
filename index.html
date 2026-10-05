@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>👑 iOS Giả Lập</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-tap-highlight-color: transparent; }
+html, body { width: 100%; height: 100%; overflow: hidden; font-family: -apple-system, 'SF Pro Display', 'Segoe UI', Arial, sans-serif; }
+
+/* ===== PHONE FRAME ===== */
+body {
+  background: radial-gradient(ellipse at center, #1a0033 0%, #000 70%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+}
+.phone {
+  position: relative;
+  width: 100%;
+  max-width: 390px;
+  aspect-ratio: 390 / 844;
+  background: #000;
+  border-radius: 54px;
+  box-shadow:
+    0 0 0 12px #1a1a1a,
+    0 0 0 14px #333,
+    0 0 0 16px #0a0a0a,
+    0 30px 80px rgba(0,0,0,0.9),
+    0 0 80px rgba(168, 85, 247, 0.4);
+  overflow: hidden;
+}
+.screen {
+  position: absolute;
+  inset: 0;
+  border-radius: 54px;
+  overflow: hidden;
+  background: #000;
+}
+
+/* ===== DYNAMIC ISLAND ===== */
+.island {
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 120px;
+  height: 34px;
+  background: #000;
+  border-radius: 20px;
+  z-index: 1000;
+}
+.island::before {
+  content: '';
+  position: absolute;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 8px;
+  height: 8px;
+  background: #1a1a2e;
+  border-radius: 50%;
+  box-shadow: inset 0 0 3px #4a4a8a;
+}
+
+/* ===== LOCK SCREEN ===== */
+#lockScreen {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, #1a0033 0%, #2d0a3e 50%, #0a0e27 100%);
+  z-index: 900;
+  transition: transform 0.5s, opacity 0.5s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 80px 30px 60px;
+  color: #fff;
+}
+#lockScreen::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(2px 2px at 15% 25%, #fff, transparent),
+    radial-gradient(1px 1px at 45% 60%, #fff, transparent),
+    radial-gradient(1.5px 1.5px at 75% 15%, #fff, transparent),
+    radial-gradient(1px 1px at 30% 80%, #fff, transparent),
+    radial-gradient(2px 2px at 60% 40%, #fff, transparent),
+    radial-gradient(1px 1px at 85% 70%, #fff, transparent),
+    radial-gradient(1.5px 1.5px at 10% 55%, #fff, transparent),
+    radial-gradient(1px 1px at 50% 10%, #fff, transparent);
+  opacity: 0.6;
+  animation: twinkle 5s ease-in-out infinite alternate;
+}
+@keyframes twinkle {
+  0% { opacity: 0.4; }
+  100% { opacity: 0.9; }
+}
+#lockScreen.hidden {
+  transform: translateY(-100%);
+  opacity: 0;
+  pointer-events: none;
+}
+.lock-time {
+  text-align: center;
+  position: relative;
+  z-index: 2;
+}
+.lock-time .time {
+  font-size: 78px;
+  font-weight: 200;
+  letter-spacing: -3px;
+  line-height: 1;
+  text-shadow: 0 0 30px rgba(255,255,255,0.3);
+}
+.lock-time .date {
+  font-size: 17px;
+  font-weight: 500;
+  margin-top: 6px;
+  opacity: 0.9;
+}
+.lock-bottom {
+  text-align: center;
+  position: relative;
+  z-index: 2;
+  width: 100%;
+}
+.swipe-hint {
+  font-size: 13px;
+  opacity: 0.6;
+  margin-bottom: 30px;
+  animation: bounce 2s ease-in-out infinite;
+}
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); opacity: 0.5; }
+  50% { transform: translateY(-5px); opacity: 0.9; }
+}
+.home-bar {
+  width: 130px;
+  height: 5px;
+  background: rgba(255,255,255,0.9);
+  border-radius: 3px;
+  margin: 0 auto;
+}
+.lock-icons {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+.lock-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.15);
+  backdrop-filter: blur(20px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+/* ===== HOME SCREEN ===== */
+#homeScreen {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, #1a0033 0%, #2d0a3e 50%, #0a0e27 100%);
+  overflow-y: auto;
+  padding: 60px 16px 90px;
+  transition: transform 0.5s, opacity 0.5s;
+}
+#homeScreen::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    radial-gradient(1px 1px at 20% 30%, #fff, transparent),
+    radial-gradient(2px 2px at 70% 20%, #fff, transparent),
+    radial-gradient(1px 1px at 40% 70%, #fff, transparent),
+    radial-gradient(1.5px 1.5px at 80% 80%, #fff, transparent),
+    radial-gradient(1px 1px at 15% 90%, #fff, transparent);
+  opacity: 0.5;
+  pointer-events: none;
+}
+.app-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px 8px;
+  position: relative;
+  z-index: 2;
+}
+.app-icon {
+  text-align: center;
+  cursor: pointer;
+  color: #fff;
+  transition: transform 0.15s;
+}
+.app-icon:active { transform: scale(0.9); }
+.app-icon .ico {
+  width: 60px;
+  height: 60px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #007aff, #00c6ff);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30px;
+  margin: 0 auto 6px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+  position: relative;
+  overflow: hidden;
+}
+.app-icon .ico::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(255,255,255,0.25) 0%, transparent 50%);
+  border-radius: 14px;
+  pointer-events: none;
+}
+.app-icon .label {
+  font-size: 11px;
+  font-weight: 500;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+  letter-spacing: 0.2px;
+}
+.ico-msg { background: linear-gradient(135deg, #22c55e, #16a34a) !important; }
+.ico-settings { background: linear-gradient(135deg, #6b7280, #4b5563) !important; }
+.ico-camera { background: linear-gradient(135deg, #1f2937, #111827) !important; }
+.ico-photos { background: linear-gradient(135deg, #ec4899, #f472b6) !important; }
+.ico-calc { background: linear-gradient(135deg, #f59e0b, #fbbf24) !important; }
+.ico-clock { background: linear-gradient(135deg, #1f2937, #374151) !important; }
+.ico-notes { background: linear-gradient(135deg, #fef3c7, #fcd34d) !important; color: #78350f !important; }
+.ico-music { background: linear-gradient(135deg, #ef4444, #f87171) !important; }
+.ico-maps { background: linear-gradient(135deg, #10b981, #34d399) !important; }
+.ico-browser { background: linear-gradient(135deg, #3b82f6, #60a5fa) !important; }
+.ico-mail { background: linear-gradient(135deg, #06b6d4, #22d3ee) !important; }
+.ico-weather { background: linear-gradient(135deg, #0ea5e9, #38bdf8) !important; }
+
+/* ===== DOCK ===== */
+.dock {
+  position: absolute;
+  bottom: 10px;
+  left: 12px;
+  right: 12px;
+  height: 78px;
+  background: rgba(30, 30, 50, 0.4);
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+  border-radius: 28px;
+  border: 1px solid rgba(255,255,255,0.15);
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding: 0 8px;
+  z-index: 100;
+}
+.dock-icon {
+  width: 58px;
+  height: 58px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+  transition: transform 0.15s;
+  position: relative;
+  overflow: hidden;
+}
+.dock-icon:active { transform: scale(0.9); }
+.dock-icon::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(255,255,255,0.25) 0%, transparent 50%);
+  pointer-events: none;
+  border-radius: 14px;
+}
+.dock-phone { background: linear-gradient(135deg, #22c55e, #16a34a) !important; }
+.dock-msg { background: linear-gradient(135deg, #22c55e, #4ade80) !important; }
+.dock-safari { background: linear-gradient(135deg, #3b82f6, #60a5fa) !important; }
+.dock-music { background: linear-gradient(135deg, #ef4444, #f87171) !important; }
+
+/* ===== HOME BAR ===== */
+.bottom-bar {
+  position: absolute;
+  bottom: 4px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 130px;
+  height: 5px;
+  background: rgba(255,255,255,0.9);
+  border-radius: 3px;
+  z-index: 200;
+  cursor: pointer;
+}
+
+/* ===== STATUS BAR ===== */
+.status-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 54px;
+  padding: 16px 24px 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  z-index: 100;
+  pointer-events: none;
+}
+.status-bar .icons { display: flex; gap: 4px; align-items: center; }
+
+/* ===== APP SCREEN ===== */
+.app-screen {
+  position: absolute;
+  inset: 0;
+  background: #000;
+  z-index: 500;
+  transform: translateY(100%);
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+  color: #fff;
+  overflow: hidden;
+}
+.app-screen.open { transform: translateY(0); }
+.app-header {
+  padding: 52px 20px 14px;
+  background: rgba(20, 20, 35, 0.95);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 17px;
+  font-weight: 700;
+}
+.app-header .back-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.1);
+  border: none;
+  color: #fff;
+  font-size: 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.app-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+}
+
+/* Calculator App */
+.calc-full-display {
+  background: #000;
+  color: #fff;
+  font-size: 52px;
+  text-align: right;
+  padding: 30px 20px;
+  min-height: 130px;
+  word-break: break-all;
+  font-weight: 300;
+  border-bottom: 1px solid #333;
+}
+.calc-full-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  padding: 16px;
+}
+.calc-full-btn {
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: #333;
+  border: none;
+  color: #fff;
+  font-size: 26px;
+  cursor: pointer;
+  font-weight: 400;
+  transition: opacity 0.15s;
+}
+.calc-full-btn:active { opacity: 0.6; }
+.calc-full-btn.op { background: #ff9500; }
+.calc-full-btn.clear { background: #a5a5a5; color: #000; }
+.calc-full-btn.zero { grid-column: span 2; border-radius: 40px; aspect-ratio: auto; }
+
+/* Settings App */
+.settings-list {
+  background: #1c1c1e;
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+.settings-item {
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-bottom: 1px solid #2c2c2e;
+  cursor: pointer;
+}
+.settings-item:last-child { border-bottom: none; }
+.settings-item:active { background: #2c2c2e; }
+.settings-item .s-ico {
+  width: 30px;
+  height: 30px;
+  border-radius: 7px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+}
+.settings-item .s-label { flex: 1; font-size: 15px; }
+.settings-item .s-val { color: #8e8e93; font-size: 14px; }
+
+/* Photos */
+.photos-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 3px;
+}
+.photo-thumb {
+  aspect-ratio: 1;
+  background: linear-gradient(135deg, #ec4899, #a855f7);
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30px;
+  cursor: pointer;
+}
+.photo-thumb:nth-child(2n) { background: linear-gradient(135deg, #3b82f6, #06b6d4); }
+.photo-thumb:nth-child(3n) { background: linear-gradient(135deg, #f59e0b, #ef4444); }
+.photo-thumb:nth-child(5n) { background: linear-gradient(135deg, #22c55e, #4ade80); }
+.photo-thumb:nth-child(7n) { background: linear-gradient(135deg, #8b5cf6, #ec4899); }
+
+/* Notes */
+.notes-area {
+  width: 100%;
+  height: calc(100% - 20px);
+  background: #1c1c1e;
+  border: none;
+  border-radius: 12px;
+  color: #fff;
+  font-family: inherit;
+  font-size: 15px;
+  padding: 16px;
+  resize: none;
+  outline: none;
+  line-height: 1.6;
+}
+
+/* Browser */
+.browser-bar-ios {
+  display: flex;
+  gap: 6px;
+  padding: 10px 16px;
+  background: #1c1c1e;
+  border-bottom: 1px solid #333;
+}
+.browser-bar-ios input {
+  flex: 1;
+  padding: 8px 12px;
+  background: #2c2c2e;
+  border: none;
+  border-radius: 10px;
+  color: #fff;
+  font-size: 14px;
+  outline: none;
+}
+.browser-frame-ios {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #8e8e93;
+  font-size: 14px;
+  text-align: center;
+  padding: 40px 20px;
+  line-height: 1.8;
+}
+
+/* Music */
+.music-now {
+  text-align: center;
+  padding: 40px 20px;
+}
+.music-cover {
+  width: 220px;
+  height: 220px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #ec4899, #a855f7);
+  margin: 0 auto 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 80px;
+  box-shadow: 0 20px 60px rgba(168, 85, 247, 0.5);
+}
+.music-title { font-size: 22px; font-weight: 700; margin-bottom: 6px; }
+.music-artist { font-size: 15px; color: #8e8e93; margin-bottom: 30px; }
+.music-controls {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  align-items: center;
+  margin-bottom: 30px;
+}
+.music-btn {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.1);
+  border: none;
+  color: #fff;
+  font-size: 22px;
+  cursor: pointer;
+}
+.music-btn.play {
+  width: 70px;
+  height: 70px;
+  background: #fff;
+  color: #000;
+  font-size: 28px;
+}
+.music-progress {
+  width: 80%;
+  height: 4px;
+  background: #333;
+  border-radius: 2px;
+  margin: 0 auto;
+  overflow: hidden;
+}
+.music-progress-bar {
+  height: 100%;
+  width: 30%;
+  background: #fff;
+  border-radius: 2px;
+}
+
+/* Weather */
+.weather-main {
+  text-align: center;
+  padding: 20px 0 40px;
+}
+.weather-city { font-size: 32px; font-weight: 300; }
+.weather-temp { font-size: 90px; font-weight: 100; line-height: 1; margin: 6px 0; }
+.weather-desc { font-size: 18px; color: #8e8e93; }
+.weather-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+.weather-card {
+  background: rgba(30, 30, 50, 0.6);
+  border-radius: 12px;
+  padding: 14px;
+}
+.weather-card .lbl {
+  font-size: 11px;
+  color: #8e8e93;
+  letter-spacing: 1px;
+  margin-bottom: 4px;
+}
+.weather-card .val { font-size: 24px; font-weight: 600; }
+
+/* Clock */
+.clock-app {
+  text-align: center;
+  padding: 20px 0;
+}
+.clock-digital {
+  font-size: 72px;
+  font-weight: 100;
+  letter-spacing: -3px;
+  margin-bottom: 10px;
+}
+.clock-date { font-size: 18px; color: #8e8e93; margin-bottom: 30px; }
+.clock-analog {
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  border: 4px solid #fff;
+  margin: 0 auto;
+  position: relative;
+}
+.clock-hand {
+  position: absolute;
+  bottom: 50%;
+  left: 50%;
+  transform-origin: bottom center;
+  background: #fff;
+  border-radius: 2px;
+}
+.hour-hand { width: 6px; height: 60px; margin-left: -3px; }
+.min-hand { width: 4px; height: 80px; margin-left: -2px; background: #8e8e93; }
+.sec-hand { width: 2px; height: 90px; margin-left: -1px; background: #ef4444; }
+.clock-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 14px;
+  height: 14px;
+  background: #fff;
+  border-radius: 50%;
+  z-index: 10;
+}
+
+/* Messages */
+.msg-list { }
+.msg-item {
+  display: flex;
+  gap: 12px;
+  padding: 12px 16px;
+  border-bottom: 1px solid #2c2c2e;
+  cursor: pointer;
+}
+.msg-item:active { background: #2c2c2e; }
+.msg-avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  font-weight: 700;
+  color: #fff;
+  flex-shrink: 0;
+}
+.msg-body { flex: 1; min-width: 0; }
+.msg-name { font-size: 15px; font-weight: 600; margin-bottom: 2px; }
+.msg-text {
+  font-size: 13px;
+  color: #8e8e93;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+</style>
+</head>
+<body>
+
+<div class="phone">
+  <div class="screen">
+
+    <!-- DYNAMIC ISLAND -->
+    <div class="island"></div>
+
+    <!-- LOCK SCREEN -->
+    <div id="lockScreen">
+      <div class="lock-time">
+        <div class="time" id="lockTime">00:00</div>
+        <div class="date" id="lockDate">Thứ Hai, 1 tháng 1</div>
+      </div>
+      <div class="lock-bottom">
+        <div class="lock-icons">
+          <div class="lock-icon">🔦</div>
+          <div class="lock-icon">📷</div>
+        </div>
+        <div class="swipe-hint" id="swipeHint">⬆️ Vuốt lên để mở khoá</div>
+        <div class="home-bar" id="lockSwipe"></div>
+      </div>
+    </div>
+
+    <!-- HOME SCREEN -->
+    <div id="homeScreen" style="transform: translateY(0)">
+
+      <!-- STATUS BAR -->
+      <div class="status-bar">
+        <div id="statusTime">00:00</div>
+        <div class="icons">📶 📶 🔋</div>
+      </div>
+
+      <!-- APP GRID -->
+      <div class="app-grid">
+        <div class="app-icon" onclick="openApp('messages')">
+          <div class="ico ico-msg">💬</div>
+          <div class="label">Tin nhắn</div>
+        </div>
+        <div class="app-icon" onclick="openApp('settings')">
+          <div class="ico ico-settings">⚙️</div>
+          <div class="label">Cài đặt</div>
+        </div>
+        <div class="app-icon" onclick="openApp('camera')">
+          <div class="ico ico-camera">📷</div>
+          <div class="label">Camera</div>
+        </div>
+        <div class="app-icon" onclick="openApp('photos')">
+          <div class="ico ico-photos">🌄</div>
+          <div class="label">Ảnh</div>
+        </div>
+
+        <div class="app-icon" onclick="openApp('calc')">
+          <div class="ico ico-calc">🧮</div>
+          <div class="label">Máy tính</div>
+        </div>
+        <div class="app-icon" onclick="openApp('clock')">
+          <div class="ico ico-clock">🕐</div>
+          <div class="label">Đồng hồ</div>
+        </div>
+        <div class="app-icon" onclick="openApp('notes')">
+          <div class="ico ico-notes">📝</div>
+          <div class="label">Ghi chú</div>
+        </div>
+        <div class="app-icon" onclick="openApp('music')">
+          <div class="ico ico-music">🎵</div>
+          <div class="label">Nhạc</div>
+        </div>
+
+        <div class="app-icon" onclick="openApp('maps')">
+          <div class="ico ico-maps">🗺️</div>
+          <div class="label">Bản đồ</div>
+        </div>
+        <div class="app-icon" onclick="openApp('browser')">
+          <div class="ico ico-browser">🌐</div>
+          <div class="label">Safari</div>
+        </div>
+        <div class="app-icon" onclick="openApp('mail')">
+          <div class="ico ico-mail">✉️</div>
+          <div class="label">Mail</div>
+        </div>
+        <div class="app-icon" onclick="openApp('weather')">
+          <div class="ico ico-weather">☀️</div>
+          <div class="label">Thời tiết</div>
+        </div>
+      </div>
+
+      <!-- DOCK -->
+      <div class="dock">
+        <div class="dock-icon dock-phone" onclick="openApp('messages')">📞</div>
+        <div class="dock-icon dock-msg" onclick="openApp('messages')">💬</div>
+        <div class="dock-icon dock-safari" onclick="openApp('browser')">🌐</div>
+        <div class="dock-icon dock-music" onclick="openApp('music')">🎵</div>
+      </div>
+    </div>
+
+    <!-- APP SCREENS -->
+    <div class="app-screen" id="app-calc">
+      <div class="app-header">
+        <button class="back-btn" onclick="closeApp()">←</button>
+        <span>Máy tính</span>
+      </div>
+      <div class="calc-full-display" id="iosCalcDisplay">0</div>
+      <div class="calc-full-grid">
+        <button class="calc-full-btn clear" onclick="iosCalcClear()">AC</button>
+        <button class="calc-full-btn clear" onclick="iosCalcSign()">±</button>
+        <button class="calc-full-btn clear" onclick="iosCalcPercent()">%</button>
+        <button class="calc-full-btn op" onclick="iosCalcOp('/')">÷</button>
+        <button class="calc-full-btn" onclick="iosCalcNum('7')">7</button>
+        <button class="calc-full-btn" onclick="iosCalcNum('8')">8</button>
+        <button class="calc-full-btn" onclick="iosCalcNum('9')">9</button>
+        <button class="calc-full-btn op" onclick="iosCalcOp('*')">×</button>
+        <button class="calc-full-btn" onclick="iosCalcNum('4')">4</button>
+        <button class="calc-full-btn" onclick="iosCalcNum('5')">5</button>
+        <button class="calc-full-btn" onclick="iosCalcNum('6')">6</button>
+        <button class="calc-full-btn op" onclick="iosCalcOp('-')">−</button>
+        <button class="calc-full-btn" 
